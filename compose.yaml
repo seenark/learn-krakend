@@ -1,0 +1,38 @@
+services:
+  krakend-validate-config:
+    container_name: krakend-validate-config
+    image: devopsfaith/krakend
+    volumes:
+      - $PWD/config:/etc/krakend/
+    command: krakend check --config /etc/krakend/krakend.json
+  krakend:
+    container_name: krakend
+    image: devopsfaith/krakend
+    volumes:
+      - $PWD/config:/etc/krakend/
+    ports:
+      - 8081:8080
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/__health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    command: krakend run -d -c /etc/krakend/krakend.json
+    depends_on:
+      - krakend-validate-config
+
+  krakend-dev:
+    container_name: krakend-dev
+    image: devopsfaith/krakend:watch
+    volumes:
+      - $PWD/dev-config:/etc/krakend/
+    ports:
+      - 8080:8080
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/__health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    command: ["run", "-dc", "/etc/krakend/krakend.json"]
+    depends_on:
+      - krakend-validate-config

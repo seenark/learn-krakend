@@ -1,0 +1,11 @@
+services:
+  app1:
+    container_name: app1
+    image: nginx
+    ports:
+      - 3002:80
+  app2:
+    container_name: app2
+    image: joseluisq/static-web-server:2
+    ports:
+      - 3001:80
